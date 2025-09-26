@@ -1,0 +1,152 @@
+Objetivo
+Actualizar mi tarjeta de presentación web de FOTON para:
+
+Que el botón/etiqueta del número de teléfono abra WhatsApp con mensaje prellenado.
+
+Que ambos emails abran Gmail Compose en una pestaña nueva con el destinatario prellenado (y asunto/cuerpo opcionales).
+
+Aplicar mejoras de performance (Core Web Vitals) según lo indicado.
+
+Colocar la imagen “09” como fondo de página por detrás del “cuadro” (contenedor principal) que ya existe.
+
+Stack y lineamientos
+
+Tech: Next.js (App Router) + React + Tailwind (o CSS modular si ya existe).
+
+Mantener el diseño actual; solo ajustar enlaces/funcionalidades y estilos de fondo.
+
+Respetar accesibilidad (focus-visible, aria-label en iconos) y rel="noopener noreferrer" en enlaces externos.
+
+Datos fijos (usar variables si procede)
+
+Nombre: Jhon Carlos Pérez Cubas
+
+Cargo: Business Manager - Foton International Trade Co., Ltd.
+
+Teléfono (WhatsApp): +51 937375605
+
+URL WhatsApp: https://wa.me/51937375605?text=${encodeURIComponent('Hola Jhon, vi tu tarjeta de presentación y me gustaría contactarte.')}
+
+Email corporativo → Gmail Compose
+
+https://mail.google.com/mail/?view=cm&fs=1&to=jhonperez@foton.com.cn&su=${encodeURIComponent('Consulta – Tarjeta FOTON')}&body=${encodeURIComponent('Hola Jhon,\n\nTe contacto desde tu tarjeta de presentación.\n\nGracias,')}
+
+Email personal → Gmail Compose
+
+https://mail.google.com/mail/?view=cm&fs=1&to=jhoncarlosperezcubas@gmail.com&su=${encodeURIComponent('Consulta – Tarjeta FOTON')}&body=${encodeURIComponent('Hola Jhon,\n\nTe contacto desde tu tarjeta de presentación.\n\nGracias,')}
+
+Importante: todos estos enlaces deben abrirse en nueva pestaña: target="_blank" + rel="noopener noreferrer".
+
+Cambios funcionales
+
+Teléfono → WhatsApp
+
+Donde hoy se usa tel:+51937375605, reemplazar por un <a> con la URL wa.me indicada.
+
+Tooltip/feedback al click: “Abriendo WhatsApp…”.
+
+Si se desea fallback (opcional): si navigator.userAgent no sugiere WhatsApp instalable, mostrar un menú con “Abrir WhatsApp Web” (link actual) y “Llamar” (tel:).
+
+Emails → Gmail Compose
+
+Reemplazar mailto: por las URLs de Gmail Compose detalladas arriba.
+
+Al hacer click, mostrar feedback: “Abriendo Gmail…”.
+
+Fallback (opcional): si falla la apertura de Gmail, degradar a mailto:.
+
+Imagen de fondo “09” detrás del cuadro
+
+La imagen se llama “09” (usa el formato real existente, p. ej. 09.jpg/09.webp).
+
+Ubicarla como background de body o del contenedor <main> de página, detrás de todo.
+
+Estilos sugeridos:
+
+background-image: url('/img/09.webp'); (ajustar ruta)
+
+background-size: cover; background-position: center; background-attachment: fixed;
+
+Añadir un overlay muy sutil (linear-gradient) para mejorar contraste.
+
+El “cuadro” (card/contenedor principal) debe conservar su fondo blanco (o semiblanco) con sombra suave para legibilidad, p. ej. bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl.
+
+Performance (Core Web Vitals)
+
+LCP < 2.5s
+
+Pre-cargar el hero image:
+
+<link rel="preload" as="image" href="/img/hero.webp" imagesrcset="/img/hero.webp 1x, /img/hero@2x.webp 2x" fetchpriority="high">
+
+
+Self-host de fuentes (o next/font con display: swap para evitar FOIT).
+
+CSS crítico inline de above-the-fold; resto diferido.
+
+Tree-shaking y code-split
+
+Cargar la galería por dynamic import (chunk aparte) y con loading="lazy" en imágenes.
+
+Evitar librerías pesadas si el mismo efecto puede lograrse con CSS/JS nativo.
+
+Socket.IO
+
+Si no hay uso real visible (estado en tiempo real), deshabilitar su carga. Si se usa, lazy-load solo cuando sea necesario.
+
+Imágenes en WEBP/AVIF, width/height definidos, alt descriptivo, y blur-up/placeholder para evitar CLS.
+
+Respetar prefers-reduced-motion en animaciones.
+
+Accesibilidad y UX
+
+tabindex, :focus-visible, aria-label en iconos (Teléfono/WhatsApp, Email, Website, Descargar vCard, Compartir).
+
+Tocar objetivo mínimo 44×44px en botones móviles.
+
+Estados: hover/active/focus con cambios de sombra/elevación (no solo color).
+
+QA / Criterios de aceptación
+
+Al click en Teléfono, se abre WhatsApp con el mensaje prellenado (web o app) en 1 nueva pestaña/ventana.
+
+Al click en Email corporativo/personal, se abre Gmail Compose con el destinatario y asunto/cuerpo prellenados en nueva pestaña.
+
+La imagen “09” se ve de fondo ocupando toda la pantalla, detrás del contenedor principal, sin interferir con la legibilidad.
+
+Lighthouse (modo móvil): Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90.
+
+LCP reportado por Lighthouse < 2.5s en conexión simulada “Fast 3G/4x CPU slow-down”.
+
+La página funciona en Chrome, Safari (iOS), Edge y Firefox actuales.
+
+Notas de implementación (Tailwind opcional)
+
+Fondo:
+
+<main class="min-h-screen bg-fixed bg-cover bg-center"
+      style="background-image:linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.15)), url('/img/09.webp');">
+  <section class="mx-auto max-w-6xl p-4">
+    <div class="rounded-2xl bg-white/90 backdrop-blur-sm shadow-xl">
+      <!-- contenido existente -->
+    </div>
+  </section>
+</main>
+
+
+Enlaces:
+
+// Teléfono → WhatsApp
+<a href={`https://wa.me/51937375605?text=${encodeURIComponent('Hola Jhon, vi tu tarjeta de presentación y me gustaría contactarte.')}`}
+   target="_blank" rel="noopener noreferrer" aria-label="Contactar por WhatsApp">
+  Teléfono: +51 937 375 605
+</a>
+
+// Email → Gmail Compose
+<a href={`https://mail.google.com/mail/?view=cm&fs=1&to=jhonperez@foton.com.cn&su=${encodeURIComponent('Consulta – Tarjeta FOTON')}&body=${encodeURIComponent('Hola Jhon,\n\nTe contacto desde tu tarjeta de presentación.\n\nGracias,')}`}
+   target="_blank" rel="noopener noreferrer" aria-label="Enviar correo a Jhon (corporativo)">
+  jhonperez@foton.com.cn
+</a>
+
+
+Entrega: actualizar los componentes afectados, probar en móvil/escritorio y adjuntar captura de Lighthouse. No cambiar textos, solo la funcionalidad de enlaces, performance y el fondo “09”.
